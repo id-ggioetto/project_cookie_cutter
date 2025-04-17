@@ -10,7 +10,7 @@ This is a template for creating Python projects based on my preferred setup.
 uv pip install cookiecutter
 
 # Generate a new project
-cookiecutter /path/to/this/template # Or use a git URL
+cookiecutter . -o ~/Documents/ # This will create the new project in ~/Documents/
 ```
 
 ## Options
