@@ -21,5 +21,5 @@ uv sync --no-default-groups --group api
 ### How to run main
 
 ```bash
-uv run {{ cookiecutter.project_slug }}/core/main.py
+uv run {{ cookiecutter.project_slug }}/core/converter.py
 ```
