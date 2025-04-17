@@ -1,5 +1,5 @@
 # Define default values across multi-stages
-ARG PROJECT_DIR=./example_project # TODO: change in case root folder is not example_project
+ARG PROJECT_DIR=./{{ cookiecutter.project_slug }}
 ARG UV_DIR=/usr/local/bin/uv
 ARG UV_PYTHON_INSTALL_DIR=/python
 ARG PROJECT_DIR_DOCKER=/app
@@ -49,9 +49,9 @@ ENV UV_COMPILE_BYTECODE=$UV_COMPILE_BYTECODE
 # Copy the files with locked dependencies
 COPY pyproject.toml uv.lock ./
 
-# Install only lint dependencies
+# Install base dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
-   uv sync --frozen --no-install-project --no-editable --only-group lint
+   uv sync --frozen --no-install-project --no-editable --no-default-groups
 
 # Stage: 'runtime'
 FROM python:3.11-slim-bullseye AS run-image
@@ -88,24 +88,10 @@ ENV UV_PYTHON_DOWNLOADS=$UV_PYTHON_DOWNLOADS
 ARG UV_COMPILE_BYTECODE
 ENV UV_COMPILE_BYTECODE=$UV_COMPILE_BYTECODE
 
-# Install git
-RUN apt update && apt install -y --no-install-recommends git \
-    && apt clean autoclean \
-    && apt autoremove -y \
-    && rm -rf /var/lib/{apt,dpkg,cache,log}
-
-# Install pre-commit hooks
-COPY .pre-commit-config.yaml ./
-RUN git init && pre-commit install-hooks -c .pre-commit-config.yaml
-
-# Copy EVERYTHING to image ( excluding .dockerignore files )
-COPY --chown=app:app . .
-
-# Add files to the git index so pre-commit can find them
-# This is necessary for `pre-commit run --all-files` to work correctly
-# It only affects the temporary git repository inside the container
-RUN git config --global --add safe.directory $PROJECT_DIR_DOCKER && git add .
+# Copy application code separately
+ARG PROJECT_DIR
+COPY --chown=app:app $PROJECT_DIR $PROJECT_DIR
 
 ENV PYTHONPATH=$PROJECT_DIR_DOCKER
 
-CMD ["./lint.sh"]
+CMD ["uv", "run", "{{ cookiecutter.project_slug }}/core/main.py"]
