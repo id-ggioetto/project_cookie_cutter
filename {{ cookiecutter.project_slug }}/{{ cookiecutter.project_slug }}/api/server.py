@@ -18,8 +18,7 @@ async def root() -> dict[str, str]:
 
 @app.post("/convert")
 async def convert() -> dict[str, str]:
-    """
-    Convert the input text using a simple transformation.
+    """Convert the input text using a simple transformation.
 
     Args:
         request: The conversion request containing the text to convert
@@ -30,10 +29,13 @@ async def convert() -> dict[str, str]:
     example_string = "Hello, World!"
     converter = Converter()
 
-    return converter.convert(example_string)
+    output = converter.convert(example_string)
+
+    return {"converted": output}
 
 
-def main():
+def main() -> None:
+    """Run main function."""
     uvicorn.run(
         "{{ cookiecutter.project_slug }}.api.server:app", host="0.0.0.0", port=8000, reload=True
     )

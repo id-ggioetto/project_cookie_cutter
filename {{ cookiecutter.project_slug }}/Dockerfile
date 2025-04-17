@@ -1,61 +1,60 @@
-# Define default values across multi-stages
+###########################################
+# Global ARGs (used across build stages)
+###########################################
 ARG PROJECT_DIR=./{{ cookiecutter.project_slug }}
+ARG PROJECT_DIR_DOCKER=/app
 ARG UV_DIR=/usr/local/bin/uv
 ARG UV_PYTHON_INSTALL_DIR=/python
-ARG PROJECT_DIR_DOCKER=/app
 ARG UV_PROJECT_ENVIRONMENT=$PROJECT_DIR_DOCKER/.venv
 ARG UV_VERSION=0.6.2
 ARG UV_PYTHON=python3.11
 ARG UV_COMPILE_BYTECODE=1
 ARG UV_PYTHON_DOWNLOADS=never
-ARG ENV UV_LINK_MODE=copy
+ARG UV_LINK_MODE=copy
 
-# Stage: 'uv'
-# It is used to define the uv Docker image
+###########################################
+# Stage 1: Get UV tool
+###########################################
 FROM ghcr.io/astral-sh/uv:$UV_VERSION AS uv
 
-# Stage: 'env'
-# It is used to define python version and install all the Python dependencies
+###########################################
+# Stage 2: Build Python environment
+###########################################
 FROM ubuntu:noble AS build
 
-# Set location for python installed by uv
-ARG UV_PYTHON_INSTALL_DIR
-ENV UV_PYTHON_INSTALL_DIR=$UV_PYTHON_INSTALL_DIR
-
+# Set working directory
 ARG PROJECT_DIR_DOCKER
 WORKDIR $PROJECT_DIR_DOCKER
 
+# Copy UV tool from first stage
 ARG UV_DIR
 COPY --from=uv /uv $UV_DIR
 
+# Configure UV settings
 ARG UV_LINK_MODE
-ENV UV_LINK_MODE=$UV_LINK_MODE
-
 ARG UV_COMPILE_BYTECODE
-ENV UV_COMPILE_BYTECODE=$UV_COMPILE_BYTECODE
-
-# Set /app/.venv for the virtual environment created by uv
 ARG UV_PROJECT_ENVIRONMENT
-ENV UV_PROJECT_ENVIRONMENT=$UV_PROJECT_ENVIRONMENT
-
-# Define Python version
 ARG UV_PYTHON
-ENV UV_PYTHON=$UV_PYTHON
+ARG UV_PYTHON_INSTALL_DIR
+ENV UV_LINK_MODE=$UV_LINK_MODE \
+    UV_COMPILE_BYTECODE=$UV_COMPILE_BYTECODE \
+    UV_PROJECT_ENVIRONMENT=$UV_PROJECT_ENVIRONMENT \
+    UV_PYTHON=$UV_PYTHON \
+    UV_PYTHON_INSTALL_DIR=$UV_PYTHON_INSTALL_DIR
 
-# Byte-compile the Python files for faster application startup
-ARG UV_COMPILE_BYTECODE
-ENV UV_COMPILE_BYTECODE=$UV_COMPILE_BYTECODE
-
-# Copy the files with locked dependencies
+# Copy dependency files
 COPY pyproject.toml uv.lock ./
 
-# Install base dependencies
+# Install dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
-   uv sync --frozen --no-install-project --no-editable --no-default-groups
+    uv sync --frozen --no-install-project --no-editable --no-default-groups
 
-# Stage: 'runtime'
+###########################################
+# Stage 3: Final runtime image
+###########################################
 FROM python:3.11-slim-bullseye AS run-image
 
+# Create non-root user
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 ENV USER=app
@@ -63,35 +62,31 @@ ENV GROUP=app
 RUN groupadd -g $GROUP_ID $GROUP && \
     useradd -u $USER_ID -g $GROUP_ID -ms /bin/bash $USER
 
-# Set PATH to use the venv python
-ARG UV_PROJECT_ENVIRONMENT
-ENV PATH="$UV_PROJECT_ENVIRONMENT/bin:$PATH"
-
-# Set /app/.venv for the virtual environment created by uv
-ENV UV_PROJECT_ENVIRONMENT=$UV_PROJECT_ENVIRONMENT
-
+# Set working directory
 ARG PROJECT_DIR_DOCKER
 WORKDIR $PROJECT_DIR_DOCKER
 
-# Copy uv, python and the installed packages
+# Configure Python and UV
+ARG UV_PROJECT_ENVIRONMENT
+ARG UV_PYTHON_DOWNLOADS
+ARG UV_COMPILE_BYTECODE
+ENV PATH="$UV_PROJECT_ENVIRONMENT/bin:$PATH" \
+    UV_PROJECT_ENVIRONMENT=$UV_PROJECT_ENVIRONMENT \
+    UV_PYTHON_DOWNLOADS=$UV_PYTHON_DOWNLOADS \
+    UV_COMPILE_BYTECODE=$UV_COMPILE_BYTECODE
+
+ENV PYTHONPATH=$PROJECT_DIR_DOCKER
+
+# Copy UV tool, Python installation, and virtual environment from build stage
 ARG UV_DIR
 ARG UV_PYTHON_INSTALL_DIR
 COPY --chown=$USER:$USER --from=build $UV_DIR $UV_DIR
 COPY --chown=$USER:$USER --from=build $UV_PYTHON_INSTALL_DIR $UV_PYTHON_INSTALL_DIR
 COPY --chown=$USER:$USER --from=build $UV_PROJECT_ENVIRONMENT $UV_PROJECT_ENVIRONMENT
 
-# Prevent uv from downloading isolated Python builds as Python is already available
-ARG UV_PYTHON_DOWNLOADS
-ENV UV_PYTHON_DOWNLOADS=$UV_PYTHON_DOWNLOADS
-
-# Byte-compile the python files for faster application startup
-ARG UV_COMPILE_BYTECODE
-ENV UV_COMPILE_BYTECODE=$UV_COMPILE_BYTECODE
-
-# Copy application code separately
+# Copy application code
 ARG PROJECT_DIR
 COPY --chown=app:app $PROJECT_DIR $PROJECT_DIR
 
-ENV PYTHONPATH=$PROJECT_DIR_DOCKER
-
-CMD ["uv", "run", "{{ cookiecutter.project_slug }}/core/main.py"]
+# Run application
+CMD ["uv", "run", "{{ cookiecutter.project_slug }}/core/converter.py"]
