@@ -7,7 +7,7 @@ ARG UV_DIR=/usr/local/bin/uv
 ARG UV_PYTHON_INSTALL_DIR=/python
 ARG UV_PROJECT_ENVIRONMENT=$PROJECT_DIR_DOCKER/.venv
 ARG UV_VERSION=0.6.2
-ARG UV_PYTHON=python3.11
+ARG UV_PYTHON=python{{ cookiecutter.python_version }}
 ARG UV_COMPILE_BYTECODE=1
 ARG UV_PYTHON_DOWNLOADS=never
 ARG UV_LINK_MODE=copy
@@ -52,7 +52,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 ###########################################
 # Stage 3: Final runtime image
 ###########################################
-FROM python:3.11-slim-bullseye AS run-image
+FROM python:{{ cookiecutter.python_version }}-slim-bullseye AS run-image
 
 # Create non-root user
 ARG USER_ID=1000
