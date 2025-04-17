@@ -1,0 +1,190 @@
+[project]
+name = "example-project-2"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+ "pydantic>=2.11.3",
+]
+
+[tool.uv]
+default-groups = ["test", "lint", "api"]
+
+[dependency-groups]
+test = ["pytest-mock==3.14.0", "pytest==8.3.3"]
+lint = ["mypy>=1.15.0", "pre-commit==4.0.1", "ruff==0.8.3"]
+api = [
+    "fastapi>=0.115.12",
+    "uvicorn>=0.34.1",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+respect-gitignore = true
+show-fixes = true
+extend-exclude = ["notebooks/*", "*.ipynb", "projects/", "scripts/", "tests/*"]
+
+[tool.ruff.lint]
+# See full list here: https://docs.astral.sh/ruff/rules/#rule-selection
+select = [
+    "A",   # flake8-builtins checks (e.g., naming conflicts with built-in functions)
+    "ARG", # flake8-unused-arguments checks (e.g., unused function arguments)
+    "ANN", # flake8-annotations checks (e.g., missing or incorrect type annotations)
+    "B",   # flake8-bugbear checks (e.g., likely bugs and design problems)
+    "B9",  # Additional flake8-bugbear checks (e.g., more specific bug patterns)
+    "C",   # flake8-comprehensions checks (e.g., unnecessary list comprehensions)
+    "C4",  # Additional flake8-comprehensions checks (e.g., more specific comprehension patterns)
+    "COM", # flake8-commas checks (e.g., trailing commas in sequences)
+    "D",   # pydocstyle checks (e.g., docstring conventions)
+    "E",   # pycodestyle error checks (e.g., PEP 8 style violations)
+    "F",   # pyflakes checks (e.g., unused imports, undefined names)
+    "ISC", # flake8-implicit-str-concat checks (e.g., implicit string concatenation)
+    "N",   # pep8-naming checks (e.g., naming conventions)
+    "PIE", # flake8-pie checks (e.g., various code quality checks)
+    "PTH", # flake8-use-pathlib checks (e.g., using pathlib over os.path)
+    "PT",  # flake8-pytest-style checks (e.g., pytest-specific style issues)
+    "Q",   # flake8-quotes checks (e.g., preferred quote styles)
+    "RET", # flake8-return checks (e.g., return statement consistency)
+    "SIM", # flake8-simplify checks (e.g., unnecessary complexity)
+    "TCH", # flake8-type-checking checks (e.g., type checking imports)
+    "UP",  # pyupgrade checks (e.g., using modern Python syntax)
+    "W",   # pycodestyle warning checks (e.g., PEP 8 style warnings)
+]
+
+ignore = [
+    "ANN101", # Missing type annotation for `self` in method
+    "ANN102", # Missing type annotation for `cls` in method
+    "ANN003", # Missing type annotation for kwargs
+    "ANN202", # Missing return type annotation for private function
+    "ANN204", # Missing return type annotation for magic method
+    "ANN401", # Dynamically typed expressions (e.g., 'Any' used)
+    "ARG002", # Unused function argument
+    "B904",   # Within a try block, raise exceptions with from None
+    "B905",   # Zip without an explicit strict parameter
+    "C416",   # Unnecessary list comprehension
+    "C419",   # Unnecessary generator
+    "COM812", # Missing trailing comma
+    "D100",   # Missing docstring in public module
+    "D104",   # Missing docstring in public package
+    "D105",   # Missing docstring in magic method
+    "D107",   # Missing docstring in __init__
+    "D205",   # 1 blank line required between summary line and description
+    "D4",     # Docstring section underline should be in the line under the section
+    "E203",   # Whitespace before ':'
+    "E501",   # Line too long (82 > 79 characters)
+    "FIX002", # TODO found
+    "N805",   # First argument of a method should be named 'self'
+    "N818",   # Error suffix for exception names
+    "PIE790", # Unnecessary pass statement
+    "PTH123", # Should use 'pathlib' instead of 'os.path' for joining paths
+    "PT018",  # Incorrect use of @pytest.mark.parametrize
+    "RET501", # Unnecessary return None statement
+    "RET504", # Unnecessary return statement with value
+    "SIM118", # Use 'key in dict' instead of 'key in dict.keys()'
+    "UP015",  # Unnecessary open mode parameter
+    "W505",   # Docstring too long
+]
+
+
+[tool.ruff.format]
+# Enable auto-formatting of code examples in docstrings.
+docstring-code-format = true
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
+
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+[tool.ruff.lint.pydocstyle]
+# Use Google-style docstrings.
+convention = "google"
+
+[tool.ruff.lint.extend-per-file-ignores]
+# Also ignore in all `__init__.py` files.
+"__init__.py" = ["E402", "F401"]
+
+[tool.ruff.lint.mccabe]
+# The maximum McCabe complexity to allow before triggering C901 errors.
+max-complexity = 15
+
+[tool.mypy]
+# Specify the Python version to use for type checking
+python_version = "3.11"
+
+exclude = [
+    "^data/",
+    "^venv/",
+    "^\\.venv/",
+]
+
+# Exclude specific files or directories from type checking
+# Enable explicit package bases to help Mypy understand the package structure
+explicit_package_bases = true
+
+mypy_path = ["."]
+
+# Add directories to the MYPYPATH to specify the base for your packages
+# Disable strict type checking options
+strict = false
+
+# Enable individual strict options manually
+disallow_any_explicit = false  # Flag explicit use of 'Any' type.
+disallow_any_decorated = false  # Flag functions decorated with 'Any'.
+disallow_any_generics = false  # Flag generic types using 'Any' (e.g., list[Any]).
+disallow_subclassing_any = false  # Flag inheriting from a class that inherits from 'Any'.
+disallow_untyped_calls = true  # Flag calls to functions lacking type annotations.
+disallow_untyped_decorators = false  # Flag decorators lacking type annotations.
+disallow_any_unimported = false  # Flag usage of 'Any' from implicitly imported modules.
+disallow_any_expr = false  # Flag all expressions resulting in an 'Any' type.
+check_untyped_defs = true  # Type check the body of functions without annotations.
+no_implicit_reexport = true  # Prevent implicit re-exporting of imported names.
+warn_unused_ignores = true  # Warn about unnecessary '# type: ignore' comments.
+warn_redundant_casts = true  # Warn about casting an expression to its inferred type.
+warn_unused_configs = true  # Warn about unused '[mypy-*]' configuration sections.
+warn_unreachable = true  # Warn about code that Mypy determines is unreachable.
+warn_no_return = true  # Warn about functions missing return statements or annotations when they don't return.
+warn_return_any = true  # Warn when a function annotated with a non-'Any' type returns 'Any'.
+implicit_reexport = false  # Allow implicit re-exporting (opposite of no_implicit_reexport).
+strict_equality = true  # Prohibit equality checks between incompatible types (e.g., int == str).
+
+disable_error_code = "no-untyped-def"
+
+# For example, to ignore missing imports:
+ignore_missing_imports = true
+
+# To allow redefinition of functions in the same class (useful for overloads)
+allow_redefinition = true
+
+# To show error messages with more context
+show_error_context = true
+
+# To show error codes in the output
+show_error_codes = true
+
+# To enable incremental mode for faster type checking
+incremental = true
+
+cache_dir = ".mypy_cache"
+
+# To enable cache for faster type checking
+# Allow untyped function definitions
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
