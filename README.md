@@ -23,3 +23,4 @@ The following options are available when generating a project:
 - `author_email`: Your email address.
 - `project_short_description`: A one-sentence description of the project.
 - `version`: The initial version of the project (e.g., "0.1.0").
+- `python_version`: The version of Python you want to install and use (e.g., "3.11")
