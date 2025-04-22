@@ -4,6 +4,10 @@ exclude: >
       \.vscode/.*|
   )$
 
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+
 repos:
   - repo: https://github.com/astral-sh/uv-pre-commit
     # uv version.

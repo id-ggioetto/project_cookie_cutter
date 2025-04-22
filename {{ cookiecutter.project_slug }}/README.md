@@ -23,3 +23,18 @@ uv sync --no-default-groups --group api
 ```bash
 uv run {{ cookiecutter.project_slug }}/core/converter.py
 ```
+
+### How to init git and pre-commits
+
+```bash
+source .venv/bin/activate
+
+git init
+
+# Optional: add remote repo ( git remote add origin https://github.com/OWNER/REPOSITORY.git )
+
+pre-commit install --install-hooks
+
+git add .
+git commit -m "feat: first commit"
+```

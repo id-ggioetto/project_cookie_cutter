@@ -8,7 +8,4 @@ uv sync --only-group lint
 echo "Running pre-commit hooks..."
 pre-commit run --all-files
 
-echo "Running mypy..."
-mypy .
-
 echo "Linting checks passed!"
