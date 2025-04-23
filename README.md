@@ -13,6 +13,19 @@ uv pip install cookiecutter
 cookiecutter . -o ~/Documents/ # This will create the new project in ~/Documents/
 ```
 
+## Features (Template Setup)
+
+This cookiecutter template generates a Python project with the following features configured:
+
+- **Packaging:** Modern Python packaging using `pyproject.toml`.
+- **Testing:** Ready for testing with `pytest` (includes `tests/` directory).
+- **Linting & Formatting:** Enforced via `pre-commit` hooks. Common tools like `ruff`, `black`, `mypy`, and `codespell` are configured (see `pyproject.toml` and `.pre-commit-config.yaml` for details). The default line length is set to 100 characters. A `lint.sh` script is also included.
+- **Containerization:** Docker support with `Dockerfile`, `.dockerignore`, and a specific linting Dockerfile (`Dockerfile_lint`).
+- **Version Control:** Pre-configured `.gitignore`.
+- **Editor Integration:** Includes settings for VS Code and cursor (`.vscode/`).
+- **Basic Structure:** Standard source layout and a basic project `README.md`.
+- **Code Organization:** Includes an example structure (`api/`, `core/`) demonstrating how to organize code into modules and import between them.
+
 ## Options
 
 The following options are available when generating a project:
