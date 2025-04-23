@@ -26,6 +26,8 @@ This cookiecutter template generates a Python project with the following feature
 - **Basic Structure:** Standard source layout and a basic project `README.md`.
 - **Code Organization:** Includes an example structure (`api/`, `core/`) demonstrating how to organize code into modules and import between them.
 
+**Note**: This template **does not** include **CI/CD pipeline configuration**. You'll need to add your preferred CI/CD solution (e.g., GitHub Actions, GitLab CI, ...) based on your project's requirements.
+
 ## Options
 
 The following options are available when generating a project:
